@@ -41,9 +41,11 @@ public class FileSigner {
 
     private static final Logger log = LoggerFactory.getLogger(FileSigner.class);
     private static final DigestAlgorithm DIGEST_ALGORITHM = DigestAlgorithm.SHA256;
-    private Configuration configuration = new Configuration(Configuration.Mode.PROD);
+    private Configuration configuration = new Configuration(Configuration.Mode.TEST);
+
 
     public Container createContainer(DataFile dataFile) {
+        configuration.setTslLocation("https://open-eid.github.io/test-TL/tl-mp-test-EE.xml");
         Container container = ContainerBuilder.
                 aContainer().
                 withDataFile(dataFile).

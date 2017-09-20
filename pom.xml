@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.digidoc4j</groupId>
 			<artifactId>digidoc4j</artifactId>
-			<version>1.0.4</version>
+			<version>1.0.6</version>
 		</dependency>
 
 		<!-- Spring BOOT dependencies -->
@@ -50,8 +50,9 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.6</version>
+			<version>1.2.3</version>
 		</dependency>
+
 	</dependencies>
 	
 	<build>
