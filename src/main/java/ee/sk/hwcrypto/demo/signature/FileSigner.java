@@ -45,7 +45,6 @@ public class FileSigner {
 
 
     public Container createContainer(DataFile dataFile) {
-        configuration.setTslLocation("https://open-eid.github.io/test-TL/tl-mp-test-EE.xml");
         Container container = ContainerBuilder.
                 aContainer().
                 withDataFile(dataFile).
