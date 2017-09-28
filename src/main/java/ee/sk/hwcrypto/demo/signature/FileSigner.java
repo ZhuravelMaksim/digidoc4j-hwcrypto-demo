@@ -24,6 +24,7 @@
 package ee.sk.hwcrypto.demo.signature;
 
 import org.digidoc4j.*;
+import org.digidoc4j.impl.bdoc.BDocContainerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class FileSigner {
 
 
     public Container createContainer(DataFile dataFile) {
-        Container container = ContainerBuilder.
+        Container container = BDocContainerBuilder.
                 aContainer().
                 withDataFile(dataFile).
                 withConfiguration(configuration).
@@ -59,6 +60,7 @@ public class FileSigner {
                 aSignature(containerToSign).
                 withSigningCertificate(certificate).
                 withSignatureDigestAlgorithm(DIGEST_ALGORITHM).
+                withSignatureProfile(SignatureProfile.LT_TM).
                 buildDataToSign();
         return dataToSign;
     }
