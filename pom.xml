@@ -70,15 +70,15 @@
   <profiles>
     <profile>
       <id>PROD</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <digidoc4j.mode>PROD</digidoc4j.mode>
       </properties>
     </profile>
     <profile>
       <id>TEST</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <digidoc4j.mode>TEST</digidoc4j.mode>
       </properties>
