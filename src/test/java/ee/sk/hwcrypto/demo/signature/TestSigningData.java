@@ -24,7 +24,7 @@
 package ee.sk.hwcrypto.demo.signature;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.digidoc4j.DigestAlgorithm;
 import org.digidoc4j.exceptions.DigiDoc4JException;
 

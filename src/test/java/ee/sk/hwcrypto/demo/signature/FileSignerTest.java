@@ -24,7 +24,9 @@
 package ee.sk.hwcrypto.demo.signature;
 
 import org.digidoc4j.*;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,12 +36,20 @@ public class FileSignerTest {
 
     private FileSigner fileSigner;
     private String certificateInHex;
-    private static Configuration configuration = new Configuration(Configuration.Mode.TEST);
+
+    @BeforeClass
+    public static void beforeClass() {
+        System.setProperty("digidoc4j.mode", "TEST");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        System.clearProperty("digidoc4j.mode");
+    }
 
     @Before
-    public void setUp() throws Exception {
+    public void before() throws Exception {
         fileSigner = new FileSigner();
-        fileSigner.setConfiguration(configuration);
         certificateInHex = TestSigningData.getSigningCertificateInHex();
     }
 

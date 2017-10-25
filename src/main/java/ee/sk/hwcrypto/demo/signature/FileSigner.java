@@ -26,6 +26,7 @@ package ee.sk.hwcrypto.demo.signature;
 import org.digidoc4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
@@ -41,13 +42,15 @@ public class FileSigner {
 
     private static final Logger log = LoggerFactory.getLogger(FileSigner.class);
     private static final DigestAlgorithm DIGEST_ALGORITHM = DigestAlgorithm.SHA256;
-    private Configuration configuration = new Configuration(Configuration.Mode.PROD);
+
+    @Autowired
+    private Configuration configuration;
 
     public Container createContainer(DataFile dataFile) {
         Container container = ContainerBuilder.
                 aContainer().
                 withDataFile(dataFile).
-                withConfiguration(configuration).
+                withConfiguration(this.configuration).
                 build();
         return container;
     }
@@ -66,10 +69,6 @@ public class FileSigner {
         byte[] signatureBytes = DatatypeConverter.parseHexBinary(signatureInHex);
         Signature signature = dataToSign.finalize(signatureBytes);
         container.addSignature(signature);
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
     }
 
     private X509Certificate getCertificate(String certificateInHex) {
