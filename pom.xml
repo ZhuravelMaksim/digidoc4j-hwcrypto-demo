@@ -22,6 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <start-class>ee.sk.hwcrypto.demo.DigiDoc4jWebApplication</start-class>
     <java.version>1.8</java.version>
+    <digidoc4j.debug></digidoc4j.debug>
   </properties>
 
   <dependencies>
@@ -59,9 +60,9 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <jvmArguments>
-            -Ddigidoc4j.mode=${digidoc4j.mode}
-          </jvmArguments>
+          <arguments>
+            <argument>--digidoc4j.mode=${digidoc4j.mode}</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>
