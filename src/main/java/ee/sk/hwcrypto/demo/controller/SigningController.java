@@ -27,7 +27,7 @@ import ee.sk.hwcrypto.demo.model.Digest;
 import ee.sk.hwcrypto.demo.model.Result;
 import ee.sk.hwcrypto.demo.model.SigningSessionData;
 import ee.sk.hwcrypto.demo.signature.FileSigner;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.digidoc4j.Container;
 import org.digidoc4j.DataFile;
 import org.digidoc4j.DataToSign;
