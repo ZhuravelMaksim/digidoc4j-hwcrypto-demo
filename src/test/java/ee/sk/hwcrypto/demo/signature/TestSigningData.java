@@ -36,7 +36,7 @@ import java.security.cert.X509Certificate;
 
 public class TestSigningData {
 
-    public static final String TEST_PKI_CONTAINER = "src/test/resources/signout.p12";
+    public static final String TEST_PKI_CONTAINER = "src/main/resources/signout.p12";
     public static final String TEST_PKI_CONTAINER_PASSWORD = "test";
 
     public static String getSigningCertificateInHex() {
