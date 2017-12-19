@@ -23,6 +23,13 @@
  */
 package ee.sk.hwcrypto.demo.signature;
 
+import org.digidoc4j.*;
+import org.digidoc4j.impl.asic.asice.bdoc.BDocContainerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,48 +37,31 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.digidoc4j.Configuration;
-import org.digidoc4j.Container;
-import org.digidoc4j.ContainerBuilder;
-import org.digidoc4j.DataFile;
-import org.digidoc4j.DataToSign;
-import org.digidoc4j.DigestAlgorithm;
-import org.digidoc4j.Signature;
-import org.digidoc4j.SignatureBuilder;
-import org.digidoc4j.SignatureProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 @Service
 public class FileSigner {
 
     private static final Logger log = LoggerFactory.getLogger(FileSigner.class);
     private static final DigestAlgorithm DIGEST_ALGORITHM = DigestAlgorithm.SHA256;
+    private Configuration configuration = new Configuration(Configuration.Mode.TEST);
 
-    @Autowired
-    private Configuration configuration;
 
     public Container createContainer(DataFile dataFile) {
-        Container container = ContainerBuilder.
-            aContainer().
-            withDataFile(dataFile).
-            withConfiguration(this.configuration).
-            build();
+        Container container = BDocContainerBuilder.
+                aContainer().
+                withDataFile(dataFile).
+                withConfiguration(configuration).
+                build();
         return container;
     }
 
     public DataToSign getDataToSign(Container containerToSign, String certificateInHex) {
         X509Certificate certificate = getCertificate(certificateInHex);
-        DataToSign dataToSign = SignatureBuilder
-            .aSignature(containerToSign)
-            .withSigningCertificate(certificate)
-            .withSignatureDigestAlgorithm(DIGEST_ALGORITHM)
-            //.withSignatureProfile(SignatureProfile.LT_TM)
-            .buildDataToSign();
+        DataToSign dataToSign = SignatureBuilder.
+                aSignature(containerToSign).
+                withSigningCertificate(certificate).
+                withSignatureDigestAlgorithm(DIGEST_ALGORITHM).
+                withSignatureProfile(SignatureProfile.LT_TM).
+                buildDataToSign();
         return dataToSign;
     }
 
@@ -81,11 +71,15 @@ public class FileSigner {
         container.addSignature(signature);
     }
 
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     private X509Certificate getCertificate(String certificateInHex) {
         byte[] certificateBytes = DatatypeConverter.parseHexBinary(certificateInHex);
         try (InputStream inStream = new ByteArrayInputStream(certificateBytes)) {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
+            X509Certificate certificate = (X509Certificate)cf.generateCertificate(inStream);
             return certificate;
         } catch (CertificateException | IOException e) {
             log.error("Error reading certificate: " + e.getMessage());
