@@ -18,7 +18,7 @@ the frontend and [DigiDoc4j](https://github.com/open-eid/digidoc4j) on the backe
 
 3. Build & Run
 
-   * Run from command line `mvn clean package` and `java -jar target/digidoc4j-hwcrypto-demo-1.0.7-SNAPSHOT.war`
+   * Run from command line `mvn clean package` and `java -jar target/digidoc4j-hwcrypto-demo-2.0.1-SNAPSHOT.war`
      * This will start an embedded Tomcat server instance at port 8080 over HTTPS (using Spring Boot).
      * You can also just run `mvn clean package` and drop that war to your favorite web server.
      * If the building with Maven is too much hassle to you, then war-file is also available in github [release area](https://github.com/open-eid/digidoc4j-hwcrypto-demo/releases). 
