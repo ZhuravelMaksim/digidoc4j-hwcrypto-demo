@@ -17,8 +17,8 @@ public class Demo {
 
     @Bean
     public org.digidoc4j.Configuration configuration() {
-        System.setProperty("digidoc4j.mode", this.environment.getProperty("digidoc4j.mode"));
-        return new org.digidoc4j.Configuration();
+        // System.setProperty("digidoc4j.mode", this.environment.getProperty("digidoc4j.mode"));
+        return new org.digidoc4j.Configuration(org.digidoc4j.Configuration.Mode.TEST);
     }
 
 }
