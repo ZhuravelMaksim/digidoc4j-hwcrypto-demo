@@ -27,6 +27,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.ArrayUtils;
 import org.digidoc4j.DigestAlgorithm;
 import org.digidoc4j.exceptions.DigiDoc4JException;
+import org.digidoc4j.signers.PKCS12SignatureToken;
 
 import java.io.FileInputStream;
 import java.security.GeneralSecurityException;
@@ -38,10 +39,15 @@ public class TestSigningData {
 
     public static final String TEST_PKI_CONTAINER = "src/main/resources/signout.p12";
     public static final String TEST_PKI_CONTAINER_PASSWORD = "test";
+    public static final String TEST_ECPKI_CONTAINER = "src/main/resources/MadDogOY.p12";
+    public static final String TEST_ECPKI_CONTAINER_PASSWORD = "test";
 
-    public static String getSigningCertificateInHex() {
+    public static String getSigningCertificateInHex(String keyMode) {
         try {
-            X509Certificate certificate = getSigningCert();
+            PKCS12SignatureToken token;
+            if ("RSA".equals(keyMode)) token = getRSAToken();
+            else token = getECToken();
+            X509Certificate certificate = token.getCertificate();
             byte[] derEncodedCertificate = certificate.getEncoded();
             String hexString = Hex.encodeHexString(derEncodedCertificate);
             return hexString;
@@ -50,56 +56,29 @@ public class TestSigningData {
         }
     }
 
-    public static String signDigest(byte[] digestToSign, DigestAlgorithm digestAlgorithm) {
-        byte[] signatureValue = sign(digestToSign, digestAlgorithm);
+    public static String signData(byte[] dataToSign, DigestAlgorithm digestAlgorithm, String keyMode) {
+        PKCS12SignatureToken token;
+        if ("RSA".equals(keyMode)) token = getRSAToken();
+        else token = getECToken();
+        byte[] signatureValue = token.sign(digestAlgorithm, dataToSign);
         String hexString = Hex.encodeHexString(signatureValue);
         return hexString;
     }
 
-    private static X509Certificate getSigningCert() {
-        return getSigningCert(TEST_PKI_CONTAINER, TEST_PKI_CONTAINER_PASSWORD);
+    private static PKCS12SignatureToken getRSAToken() {
+        return getToken(TEST_PKI_CONTAINER, TEST_PKI_CONTAINER_PASSWORD);
     }
 
-    private static X509Certificate getSigningCert(String pkiContainer, String pkiContainerPassword) {
+    private static PKCS12SignatureToken getECToken() {
+        return getToken(TEST_ECPKI_CONTAINER, TEST_ECPKI_CONTAINER_PASSWORD);
+    }
+
+    private static PKCS12SignatureToken getToken(String pkiContainer, String pkiContainerPassword) {
         try {
-            KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            try (FileInputStream stream = new FileInputStream(pkiContainer)) {
-                keyStore.load(stream, pkiContainerPassword.toCharArray());
-            }
-            return (X509Certificate) keyStore.getCertificate("1");
+            PKCS12SignatureToken token = new PKCS12SignatureToken(pkiContainer, pkiContainerPassword);
+            return token;
         } catch (Exception e) {
-            throw new RuntimeException("Loading signer cert failed");
-        }
-    }
-
-    private static byte[] sign(byte[] dataToSign, DigestAlgorithm digestAlgorithm) {
-        try {
-            KeyStore keyStore = KeyStore.getInstance("PKCS12");
-            try (FileInputStream stream = new FileInputStream(TEST_PKI_CONTAINER)) {
-                keyStore.load(stream, TEST_PKI_CONTAINER_PASSWORD.toCharArray());
-            }
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey("1", TEST_PKI_CONTAINER_PASSWORD.toCharArray());
-            final String javaSignatureAlgorithm = "NONEwith" + privateKey.getAlgorithm();
-
-            return encrypt(javaSignatureAlgorithm, privateKey, addPadding(dataToSign, digestAlgorithm));
-        } catch (Exception e) {
-            throw new DigiDoc4JException("Loading private key failed");
-        }
-    }
-
-    private static byte[] addPadding(byte[] digest, DigestAlgorithm digestAlgorithm) {
-        return ArrayUtils.addAll(digestAlgorithm.digestInfoPrefix(), digest);
-    }
-
-    private static byte[] encrypt(final String javaSignatureAlgorithm, final PrivateKey privateKey, final byte[] bytes) {
-        try {
-            java.security.Signature signature = java.security.Signature.getInstance(javaSignatureAlgorithm);
-            signature.initSign(privateKey);
-            signature.update(bytes);
-            final byte[] signatureValue = signature.sign();
-            return signatureValue;
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Loading signer token failed");
         }
     }
 }

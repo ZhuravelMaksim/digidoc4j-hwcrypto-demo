@@ -33,14 +33,12 @@ import static org.junit.Assert.assertTrue;
 public class FileSignerTest {
 
     private FileSigner fileSigner;
-    private String certificateInHex;
     private static Configuration configuration = new Configuration(Configuration.Mode.TEST);
 
     @Before
     public void setUp() throws Exception {
         fileSigner = new FileSigner();
         fileSigner.setConfiguration(configuration);
-        certificateInHex = TestSigningData.getSigningCertificateInHex();
     }
 
     @Test
@@ -53,18 +51,33 @@ public class FileSignerTest {
     @Test
     public void gettingDataToSign() throws Exception {
         DataFile file = createFile("test.txt", "Test data to sign");
+        String certificateInHex = TestSigningData.getSigningCertificateInHex("RSA");
         Container container = fileSigner.createContainer(file);
         DataToSign dataToSign = fileSigner.getDataToSign(container, certificateInHex);
-        assertTrue(dataToSign.getDigestToSign().length > 0);
+        assertTrue(dataToSign.getDataToSign().length > 0);
     }
 
     @Test
-    public void signDocument() throws Exception {
+    public void signDocumentWithRSA() throws Exception {
         DataFile file = createFile("test.txt", "Test data to sign");
+        String certificateInHex = TestSigningData.getSigningCertificateInHex("RSA");
         Container container = fileSigner.createContainer(file);
         DataToSign dataToSign = fileSigner.getDataToSign(container, certificateInHex);
-        byte[] digestToSign = dataToSign.getDigestToSign();
-        String signatureInHex = TestSigningData.signDigest(digestToSign, DigestAlgorithm.SHA256);
+        byte[] data = dataToSign.getDataToSign();
+        String signatureInHex = TestSigningData.signData(data, DigestAlgorithm.SHA256, "RSA");
+        fileSigner.signContainer(container, dataToSign, signatureInHex);
+        assertEquals(1, container.getSignatures().size());
+        assertTrue(container.validate().isValid());
+    }
+
+    @Test
+    public void signDocumentWithEC() throws Exception {
+        DataFile file = createFile("test.txt", "Test data to sign");
+        String certificateInHex = TestSigningData.getSigningCertificateInHex("EC");
+        Container container = fileSigner.createContainer(file);
+        DataToSign dataToSign = fileSigner.getDataToSign(container, certificateInHex);
+        byte[] data = dataToSign.getDataToSign();
+        String signatureInHex = TestSigningData.signData(data, DigestAlgorithm.SHA256, "EC");
         fileSigner.signContainer(container, dataToSign, signatureInHex);
         assertEquals(1, container.getSignatures().size());
         assertTrue(container.validate().isValid());

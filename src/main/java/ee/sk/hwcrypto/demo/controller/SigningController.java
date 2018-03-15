@@ -27,6 +27,8 @@ import ee.sk.hwcrypto.demo.model.Digest;
 import ee.sk.hwcrypto.demo.model.Result;
 import ee.sk.hwcrypto.demo.model.SigningSessionData;
 import ee.sk.hwcrypto.demo.signature.FileSigner;
+import eu.europa.esig.dss.DSSUtils;
+import eu.europa.esig.dss.DigestAlgorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.digidoc4j.Container;
 import org.digidoc4j.DataFile;
@@ -77,7 +79,8 @@ public class SigningController {
         try {
             DataToSign dataToSign = signer.getDataToSign(container, certInHex);
             session.setDataToSign(dataToSign);
-            String dataToSignInHex = DatatypeConverter.printHexBinary(dataToSign.getDigestToSign());
+            String dataToSignInHex =
+                    DatatypeConverter.printHexBinary(DSSUtils.digest(DigestAlgorithm.SHA256, dataToSign.getDataToSign()));
             digest.setHex(dataToSignInHex);
             digest.setResult(Result.OK);
         } catch (Exception e) {
