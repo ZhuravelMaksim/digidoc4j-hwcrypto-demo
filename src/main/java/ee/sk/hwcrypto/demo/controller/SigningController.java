@@ -44,6 +44,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 public class SigningController {
@@ -55,18 +59,21 @@ public class SigningController {
     private FileSigner signer;
 
     @RequestMapping(value="/upload", method= RequestMethod.POST)
-    public Result handleUpload(@RequestParam MultipartFile file) {
-        log.debug("Handling file upload for file "+file.getOriginalFilename());
+    public Result handleUpload(@RequestParam List<MultipartFile> file) {
+        log.debug("Handling file upload");
         try {
-            byte[] fileBytes = file.getBytes();
-            String fileName = file.getOriginalFilename();
-            String mimeType = file.getContentType();
-            DataFile dataFile = new DataFile(fileBytes, fileName, mimeType);
-            Container container = signer.createContainer(dataFile);
+            List<DataFile> dataFiles = new ArrayList<>();
+            for (MultipartFile multipartFile : file) {
+                byte[] fileBytes = multipartFile.getBytes();
+                String fileName = multipartFile.getOriginalFilename();
+                String mimeType = multipartFile.getContentType();
+                dataFiles.add(new DataFile(fileBytes, fileName, mimeType));
+            }
+            Container container = signer.createContainer(dataFiles);
             session.setContainer(container);
             return Result.resultOk();
         } catch (IOException e) {
-            log.error("Error reading bytes from uploaded file " + file.getOriginalFilename(), e);
+            log.error("Error reading bytes from uploaded files", e);
         }
         return Result.resultUploadingError();
     }

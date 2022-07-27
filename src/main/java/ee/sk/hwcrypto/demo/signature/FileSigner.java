@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 @Service
 public class FileSigner {
@@ -45,23 +46,31 @@ public class FileSigner {
     private Configuration configuration = new Configuration(Configuration.Mode.TEST);
 
 
+    public Container createContainer(List<DataFile> dataFiles) {
+        ContainerBuilder containerBuilder = BDocContainerBuilder
+                .aContainer()
+                .withConfiguration(configuration);
+        dataFiles.forEach(containerBuilder::withDataFile);
+        return containerBuilder.build();
+    }
+
     public Container createContainer(DataFile dataFile) {
-        Container container = BDocContainerBuilder.
-                aContainer().
-                withDataFile(dataFile).
-                withConfiguration(configuration).
-                build();
+        Container container = BDocContainerBuilder
+                .aContainer()
+                .withDataFile(dataFile)
+                .withConfiguration(configuration)
+                .build();
         return container;
     }
 
     public DataToSign getDataToSign(Container containerToSign, String certificateInHex) {
         X509Certificate certificate = getCertificate(certificateInHex);
-        DataToSign dataToSign = SignatureBuilder.
-                aSignature(containerToSign).
-                withSigningCertificate(certificate).
-                withSignatureDigestAlgorithm(DIGEST_ALGORITHM).
-                withSignatureProfile(SignatureProfile.LT_TM).
-                buildDataToSign();
+        DataToSign dataToSign = SignatureBuilder
+                .aSignature(containerToSign)
+                .withSigningCertificate(certificate)
+                .withSignatureDigestAlgorithm(DIGEST_ALGORITHM)
+                .withSignatureProfile(SignatureProfile.LT_TM)
+                .buildDataToSign();
         return dataToSign;
     }
 
