@@ -31,11 +31,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 @Controller
 public class ViewController {
@@ -51,9 +53,9 @@ public class ViewController {
     }
 
     @RequestMapping("/downloadContainer")
-    public void downloadContainer(HttpServletResponse response) {
+    public void downloadContainer(HttpServletResponse response, @RequestParam String containerName) {
         Container container = session.getContainer();
-        String fileName = container.getDataFiles().get(0).getName() + ".bdoc";
+        String fileName = Optional.ofNullable(containerName).orElse(container.getDataFiles().get(0).getName()) + ".bdoc";
         response.setContentType(CONTAINER_MIME_TYPE);
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         try {
